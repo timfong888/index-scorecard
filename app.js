@@ -611,6 +611,9 @@ async function loadProtocol(protocolSlug = null) {
         // Calculate trilemma scores
         const trilemmaScores = calculateTrilemmaScores(scores.pillars, yieldData, defiLlamaData);
 
+        // Use trilemma central score as the main INDEX SCORE
+        scores.indexScore = trilemmaScores.central;
+
         // Render UI
         renderScorecard(scores, protocolConfig);
         renderTrilemma(trilemmaScores);
