@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "name": "index-scorecard",
+  "public": true,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=300"
+      }
+    }
+  ]
+}

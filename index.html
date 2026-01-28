@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Protocol - DeFi Risk Scorecard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">IDX</span>
+                <span class="logo-text">Index Protocol</span>
+            </div>
+            <div class="header-subtitle">DeFi Risk Intelligence</div>
+        </header>
+
+        <!-- Protocol Selector -->
+        <div class="protocol-selector">
+            <label for="protocol-select">Select Protocol:</label>
+            <select id="protocol-select">
+                <option value="aerodrome-finance">Aerodrome Finance (Base)</option>
+                <option value="velodrome-finance">Velodrome (Optimism)</option>
+                <option value="uniswap">Uniswap (Ethereum)</option>
+            </select>
+            <button id="refresh-btn" class="refresh-btn">Refresh Data</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Fetching on-chain data...</p>
+        </div>
+
+        <!-- Main Scorecard -->
+        <main id="scorecard" class="scorecard hidden">
+            <!-- Protocol Header -->
+            <div class="protocol-header">
+                <div class="protocol-info">
+                    <h1 id="protocol-name">Aerodrome Finance</h1>
+                    <div class="protocol-meta">
+                        <span id="protocol-chain" class="chain-badge">Base</span>
+                        <span id="protocol-category" class="category-badge">DEX</span>
+                        <span id="last-updated" class="timestamp"></span>
+                    </div>
+                </div>
+                <div class="hero-score">
+                    <div class="score-circle" id="hero-score-circle">
+                        <span id="hero-score-value">--</span>
+                    </div>
+                    <div class="score-label">INDEX SCORE</div>
+                    <div id="score-rating" class="score-rating">--</div>
+                </div>
+            </div>
+
+            <!-- Key Metrics Bar -->
+            <div class="metrics-bar">
+                <div class="metric">
+                    <span class="metric-label">TVL</span>
+                    <span id="metric-tvl" class="metric-value">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">24h Volume</span>
+                    <span id="metric-volume" class="metric-value">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Chain Dominance</span>
+                    <span id="metric-dominance" class="metric-value">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Days Live</span>
+                    <span id="metric-age" class="metric-value">--</span>
+                </div>
+            </div>
+
+            <!-- Pillar Scores -->
+            <div class="pillars-grid">
+                <!-- Smart Contract -->
+                <div class="pillar" data-pillar="smartContract">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🔐</div>
+                        <div class="pillar-title">Smart Contract</div>
+                        <div class="pillar-score" id="score-smartContract">--</div>
+                    </div>
+                    <div class="pillar-bar">
+                        <div class="pillar-bar-fill" id="bar-smartContract"></div>
+                    </div>
+                    <div class="pillar-details hidden" id="details-smartContract">
+                        <div class="detail-row">
+                            <span>Audits</span>
+                            <span id="detail-audits">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Time on Mainnet</span>
+                            <span id="detail-mainnet-time">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Critical Vulnerabilities</span>
+                            <span id="detail-vulns">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Open Source</span>
+                            <span id="detail-opensource">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Bug Bounty</span>
+                            <span id="detail-bounty">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial/Liquidity -->
+                <div class="pillar" data-pillar="liquidity">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">💧</div>
+                        <div class="pillar-title">Financial / Liquidity</div>
+                        <div class="pillar-score" id="score-liquidity">--</div>
+                    </div>
+                    <div class="pillar-bar">
+                        <div class="pillar-bar-fill" id="bar-liquidity"></div>
+                    </div>
+                    <div class="pillar-details hidden" id="details-liquidity">
+                        <div class="detail-row">
+                            <span>Total Value Locked</span>
+                            <span id="detail-tvl">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>TVL Rank on Chain</span>
+                            <span id="detail-tvl-rank">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Volume/TVL Efficiency</span>
+                            <span id="detail-efficiency">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Liquidity Trend (30d)</span>
+                            <span id="detail-trend">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Governance -->
+                <div class="pillar" data-pillar="governance">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🗳️</div>
+                        <div class="pillar-title">Governance</div>
+                        <div class="pillar-score" id="score-governance">--</div>
+                    </div>
+                    <div class="pillar-bar">
+                        <div class="pillar-bar-fill" id="bar-governance"></div>
+                    </div>
+                    <div class="pillar-details hidden" id="details-governance">
+                        <div class="detail-row">
+                            <span>Top 10 Holders %</span>
+                            <span id="detail-concentration">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Governance Model</span>
+                            <span id="detail-gov-model">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Active Voters</span>
+                            <span id="detail-voters">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Proposal Activity</span>
+                            <span id="detail-proposals">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operational Security -->
+                <div class="pillar" data-pillar="operational">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">🛡️</div>
+                        <div class="pillar-title">Operational Security</div>
+                        <div class="pillar-score" id="score-operational">--</div>
+                    </div>
+                    <div class="pillar-bar">
+                        <div class="pillar-bar-fill" id="bar-operational"></div>
+                    </div>
+                    <div class="pillar-details hidden" id="details-operational">
+                        <div class="detail-row">
+                            <span>Multisig</span>
+                            <span id="detail-multisig">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Timelock</span>
+                            <span id="detail-timelock">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Incident History</span>
+                            <span id="detail-incidents">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Upgrade Pattern</span>
+                            <span id="detail-upgrades">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Regulatory Alignment -->
+                <div class="pillar" data-pillar="regulatory">
+                    <div class="pillar-header">
+                        <div class="pillar-icon">⚖️</div>
+                        <div class="pillar-title">Regulatory Alignment</div>
+                        <div class="pillar-score" id="score-regulatory">--</div>
+                    </div>
+                    <div class="pillar-bar">
+                        <div class="pillar-bar-fill" id="bar-regulatory"></div>
+                    </div>
+                    <div class="pillar-details hidden" id="details-regulatory">
+                        <div class="detail-row">
+                            <span>Institutional Backing</span>
+                            <span id="detail-backing">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Compliance Docs</span>
+                            <span id="detail-compliance">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Jurisdiction</span>
+                            <span id="detail-jurisdiction">--</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Team Transparency</span>
+                            <span id="detail-team">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Findings Section -->
+            <div class="findings-section">
+                <div class="findings-column">
+                    <h3 class="findings-title positive">Strengths</h3>
+                    <ul id="strengths-list" class="findings-list"></ul>
+                </div>
+                <div class="findings-column">
+                    <h3 class="findings-title negative">Risk Factors</h3>
+                    <ul id="risks-list" class="findings-list"></ul>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="scorecard-footer">
+                <div class="data-sources">
+                    <span>Data Sources:</span>
+                    <a href="https://defillama.com" target="_blank">DefiLlama</a>
+                    <a href="https://ormilabs.com" target="_blank">Ormilabs</a>
+                </div>
+                <div class="disclaimer">
+                    This assessment is for informational purposes only. Not financial advice.
+                </div>
+                <div class="branding">
+                    <a href="https://theindexprotocol.com">theindexprotocol.com</a>
+                </div>
+            </footer>
+        </main>
+
+        <!-- Error State -->
+        <div id="error" class="error hidden">
+            <div class="error-icon">⚠️</div>
+            <h2>Unable to fetch data</h2>
+            <p id="error-message"></p>
+            <button onclick="loadProtocol()">Try Again</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
