@@ -479,7 +479,7 @@ function formatNumber(value) {
     return num.toString();
 }
 
-function renderScorecard(scores, protocolConfig) {
+function renderScorecard(scores, protocolConfig, trilemmaScores, defiLlamaData) {
     const launchDate = new Date(protocolConfig.launchDate);
     const daysLive = Math.floor((Date.now() - launchDate) / (1000 * 60 * 60 * 24));
     const rating = getScoreRating(scores.indexScore);
@@ -491,15 +491,22 @@ function renderScorecard(scores, protocolConfig) {
     document.getElementById('protocol-category').textContent = protocolConfig.category;
     document.getElementById('last-updated').textContent = `Updated: ${new Date().toLocaleString()}`;
 
-    // Hero score
-    const heroCircle = document.getElementById('hero-score-circle');
-    heroCircle.style.setProperty('--score-pct', scores.indexScore);
-    heroCircle.style.setProperty('--score-color', `var(--color-score-${rating.class})`);
-    document.getElementById('hero-score-value').textContent = scores.indexScore;
-
+    // Score rating
     const ratingEl = document.getElementById('score-rating');
     ratingEl.textContent = rating.label;
     ratingEl.className = `score-rating ${rating.class}`;
+
+    // Score change (using 7d TVL change as proxy for score momentum)
+    const change7d = defiLlamaData.change_7d || 0;
+    const changeEl = document.getElementById('change-value');
+    if (change7d !== null && change7d !== undefined) {
+        const changeStr = change7d >= 0 ? `+${change7d.toFixed(1)}%` : `${change7d.toFixed(1)}%`;
+        changeEl.textContent = changeStr;
+        changeEl.className = `change-value ${change7d > 0 ? 'positive' : change7d < 0 ? 'negative' : 'neutral'}`;
+    } else {
+        changeEl.textContent = '--';
+        changeEl.className = 'change-value neutral';
+    }
 
     // Metrics bar
     const totalTvl = Object.values(scores.defiLlamaData.currentChainTvls || {}).reduce((sum, v) => sum + (v || 0), 0);
@@ -615,7 +622,7 @@ async function loadProtocol(protocolSlug = null) {
         scores.indexScore = trilemmaScores.central;
 
         // Render UI
-        renderScorecard(scores, protocolConfig);
+        renderScorecard(scores, protocolConfig, trilemmaScores, defiLlamaData);
         renderTrilemma(trilemmaScores);
 
         // Show scorecard

@@ -206,54 +206,66 @@ body {
     font-size: 12px;
 }
 
-/* Hero Score */
-.hero-score {
+/* Hero Trilemma Score */
+.hero-trilemma {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
 }
 
-.score-circle {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+.hero-trilemma-svg {
+    width: 240px;
+    height: 200px;
+}
+
+.hero-score-info {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    font-weight: 700;
-    background: conic-gradient(
-        var(--score-color, var(--color-score-good)) calc(var(--score-pct, 0) * 3.6deg),
-        var(--color-border) 0
-    );
-    position: relative;
-}
-
-.score-circle::before {
-    content: '';
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: var(--color-surface);
-    border-radius: 50%;
-}
-
-.score-circle span {
-    position: relative;
-    z-index: 1;
+    gap: 6px;
 }
 
 .score-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
+.score-change {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.change-value {
+    color: var(--color-score-good);
+}
+
+.change-value.positive {
+    color: var(--color-score-good);
+}
+
+.change-value.negative {
+    color: var(--color-score-poor);
+}
+
+.change-value.neutral {
+    color: var(--color-text-muted);
+}
+
+.change-period {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 400;
+}
+
 .score-rating {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     padding: 4px 12px;
     border-radius: var(--radius-full);
@@ -265,82 +277,6 @@ body {
 .score-rating.good { background: rgba(34, 197, 94, 0.2); color: var(--color-score-good); }
 .score-rating.moderate { background: rgba(245, 158, 11, 0.2); color: var(--color-score-moderate); }
 .score-rating.poor { background: rgba(239, 68, 68, 0.2); color: var(--color-score-poor); }
-
-/* Trilemma Section */
-.trilemma-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px;
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-}
-
-.trilemma-svg {
-    max-width: 100%;
-    height: auto;
-}
-
-.trilemma-vertex {
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.trilemma-vertex:hover {
-    opacity: 0.8;
-}
-
-.trilemma-legend {
-    display: flex;
-    gap: 24px;
-    margin-top: 24px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--color-text-secondary);
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-
-.legend-dot.yield {
-    background: #4A9EF7;
-}
-
-.legend-dot.safety {
-    background: #00D9A5;
-}
-
-.legend-dot.liquidity {
-    background: #8B5CF6;
-}
-
-/* Trilemma responsive */
-@media (max-width: 768px) {
-    .trilemma-section {
-        padding: 24px 16px;
-    }
-
-    .trilemma-svg {
-        width: 300px;
-        height: 240px;
-    }
-
-    .trilemma-legend {
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-    }
-}
 
 /* Metrics Bar */
 .metrics-bar {

@@ -49,96 +49,73 @@
                         <span id="last-updated" class="timestamp"></span>
                     </div>
                 </div>
-                <div class="hero-score">
-                    <div class="score-circle" id="hero-score-circle">
-                        <span id="hero-score-value">--</span>
-                    </div>
-                    <div class="score-label">INDEX SCORE</div>
-                    <div id="score-rating" class="score-rating">--</div>
-                </div>
-            </div>
+                <!-- Hero Trilemma Score -->
+                <div class="hero-trilemma">
+                    <svg class="hero-trilemma-svg" viewBox="0 0 240 200">
+                        <defs>
+                            <linearGradient id="trilemmaGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#00D9A5">
+                                    <animate attributeName="stop-color" values="#00D9A5; #4A9EF7; #8B5CF6; #00D9A5" dur="8s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="50%" stop-color="#4A9EF7">
+                                    <animate attributeName="stop-color" values="#4A9EF7; #8B5CF6; #00D9A5; #4A9EF7" dur="8s" repeatCount="indefinite"/>
+                                </stop>
+                                <stop offset="100%" stop-color="#8B5CF6">
+                                    <animate attributeName="stop-color" values="#8B5CF6; #00D9A5; #4A9EF7; #8B5CF6" dur="8s" repeatCount="indefinite"/>
+                                </stop>
+                            </linearGradient>
+                            <filter id="trilemmaGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="2" result="blur"/>
+                                <feMerge>
+                                    <feMergeNode in="blur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-            <!-- Trilemma Score Section -->
-            <div class="trilemma-section">
-                <svg class="trilemma-svg" viewBox="0 0 400 320" width="400" height="320">
-                    <defs>
-                        <!-- Animated gradient for triangle edges -->
-                        <linearGradient id="trilemmaGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#00D9A5">
-                                <animate attributeName="stop-color" values="#00D9A5; #4A9EF7; #8B5CF6; #00D9A5" dur="8s" repeatCount="indefinite"/>
-                            </stop>
-                            <stop offset="50%" stop-color="#4A9EF7">
-                                <animate attributeName="stop-color" values="#4A9EF7; #8B5CF6; #00D9A5; #4A9EF7" dur="8s" repeatCount="indefinite"/>
-                            </stop>
-                            <stop offset="100%" stop-color="#8B5CF6">
-                                <animate attributeName="stop-color" values="#8B5CF6; #00D9A5; #4A9EF7; #8B5CF6" dur="8s" repeatCount="indefinite"/>
-                            </stop>
-                        </linearGradient>
-                        <!-- Glow filter -->
-                        <filter id="trilemmaGlow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="3" result="blur"/>
-                            <feMerge>
-                                <feMergeNode in="blur"/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                    </defs>
+                        <!-- Triangle -->
+                        <polygon
+                            points="120,30 200,145 40,145"
+                            fill="none"
+                            stroke="url(#trilemmaGradient)"
+                            stroke-width="2"
+                            filter="url(#trilemmaGlow)"
+                        />
 
-                    <!-- Triangle -->
-                    <polygon
-                        points="200,45 330,220 70,220"
-                        fill="none"
-                        stroke="url(#trilemmaGradient)"
-                        stroke-width="2"
-                        filter="url(#trilemmaGlow)"
-                    />
+                        <!-- Central score circle -->
+                        <circle cx="120" cy="105" r="32" fill="rgba(10,10,15,0.95)"/>
+                        <text id="trilemma-central-score" x="120" y="113" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-size="28" font-weight="700">--</text>
 
-                    <!-- Central score circle -->
-                    <circle cx="200" cy="160" r="45" fill="rgba(10,10,15,0.95)"/>
-                    <text id="trilemma-central-score" x="200" y="172" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-size="36" font-weight="600">--</text>
+                        <!-- YIELD (top) -->
+                        <text x="120" y="14" text-anchor="middle" fill="#4A9EF7" font-family="Inter, sans-serif" font-size="9" font-weight="500" letter-spacing="0.5">YIELD</text>
+                        <text id="trilemma-yield-score" x="120" y="26" text-anchor="middle" fill="#4A9EF7" font-family="Inter, sans-serif" font-size="12" font-weight="600">--</text>
 
-                    <!-- YIELD label (top) -->
-                    <g class="trilemma-vertex" data-vertex="yield">
-                        <text x="200" y="25" text-anchor="middle" fill="#4A9EF7" font-family="Inter, sans-serif" font-size="11" font-weight="500" letter-spacing="1">YIELD</text>
-                        <text id="trilemma-yield-score" x="200" y="42" text-anchor="middle" fill="#4A9EF7" font-family="Inter, sans-serif" font-size="16" font-weight="600">--</text>
-                    </g>
+                        <!-- SAFETY (bottom left) -->
+                        <text x="30" y="162" text-anchor="middle" fill="#00D9A5" font-family="Inter, sans-serif" font-size="9" font-weight="500" letter-spacing="0.5">SAFETY</text>
+                        <text id="trilemma-safety-score" x="30" y="174" text-anchor="middle" fill="#00D9A5" font-family="Inter, sans-serif" font-size="12" font-weight="600">--</text>
 
-                    <!-- SAFETY label (bottom left) -->
-                    <g class="trilemma-vertex" data-vertex="safety">
-                        <text x="55" y="245" text-anchor="middle" fill="#00D9A5" font-family="Inter, sans-serif" font-size="11" font-weight="500" letter-spacing="1">SAFETY</text>
-                        <text id="trilemma-safety-score" x="55" y="262" text-anchor="middle" fill="#00D9A5" font-family="Inter, sans-serif" font-size="16" font-weight="600">--</text>
-                    </g>
+                        <!-- LIQUIDITY (bottom right) -->
+                        <text x="210" y="162" text-anchor="middle" fill="#8B5CF6" font-family="Inter, sans-serif" font-size="9" font-weight="500" letter-spacing="0.5">LIQUIDITY</text>
+                        <text id="trilemma-liquidity-score" x="210" y="174" text-anchor="middle" fill="#8B5CF6" font-family="Inter, sans-serif" font-size="12" font-weight="600">--</text>
 
-                    <!-- LIQUIDITY label (bottom right) -->
-                    <g class="trilemma-vertex" data-vertex="liquidity">
-                        <text x="345" y="245" text-anchor="middle" fill="#8B5CF6" font-family="Inter, sans-serif" font-size="11" font-weight="500" letter-spacing="1">LIQUIDITY</text>
-                        <text id="trilemma-liquidity-score" x="345" y="262" text-anchor="middle" fill="#8B5CF6" font-family="Inter, sans-serif" font-size="16" font-weight="600">--</text>
-                    </g>
-
-                    <!-- Contribution indicators (small dots on edges) -->
-                    <circle class="pulse-dot" cx="200" cy="45" r="3" fill="#4A9EF7" opacity="0.7">
-                        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <circle class="pulse-dot" cx="70" cy="220" r="3" fill="#00D9A5" opacity="0.7">
-                        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite" begin="0.5s"/>
-                    </circle>
-                    <circle class="pulse-dot" cx="330" cy="220" r="3" fill="#8B5CF6" opacity="0.7">
-                        <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite" begin="1s"/>
-                    </circle>
-                </svg>
-
-                <div class="trilemma-legend">
-                    <div class="legend-item">
-                        <span class="legend-dot yield"></span>
-                        <span class="legend-label">Yield: APY & Returns</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot safety"></span>
-                        <span class="legend-label">Safety: Smart Contract + Governance</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot liquidity"></span>
-                        <span class="legend-label">Liquidity: Exit Depth + TVL</span>
+                        <!-- Pulse dots -->
+                        <circle cx="120" cy="30" r="2" fill="#4A9EF7" opacity="0.7">
+                            <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="40" cy="145" r="2" fill="#00D9A5" opacity="0.7">
+                            <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+                        </circle>
+                        <circle cx="200" cy="145" r="2" fill="#8B5CF6" opacity="0.7">
+                            <animate attributeName="opacity" values="0.7;0.3;0.7" dur="2s" repeatCount="indefinite" begin="1s"/>
+                        </circle>
+                    </svg>
+                    <div class="hero-score-info">
+                        <div class="score-label">INDEX SCORE</div>
+                        <div class="score-change" id="score-change">
+                            <span class="change-value" id="change-value">--</span>
+                            <span class="change-period">7d</span>
+                        </div>
+                        <div id="score-rating" class="score-rating">--</div>
                     </div>
                 </div>
             </div>
