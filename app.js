@@ -110,6 +110,42 @@ async function fetchChainTVL(chain) {
     return chainData ? chainData.tvl : 0;
 }
 
+async function fetchYieldData(protocolSlug) {
+    try {
+        const response = await fetch('https://yields.llama.fi/pools');
+        if (!response.ok) return null;
+        const data = await response.json();
+
+        // Filter pools for this protocol
+        const protocolPools = data.data.filter(pool =>
+            pool.project && pool.project.toLowerCase().includes(protocolSlug.toLowerCase().replace('-', ''))
+        );
+
+        if (protocolPools.length === 0) return null;
+
+        // Calculate average APY and other yield metrics
+        const avgApy = protocolPools.reduce((sum, p) => sum + (p.apy || 0), 0) / protocolPools.length;
+        const maxApy = Math.max(...protocolPools.map(p => p.apy || 0));
+        const totalTvlUsd = protocolPools.reduce((sum, p) => sum + (p.tvlUsd || 0), 0);
+
+        // Check yield stability (variance over 7 days if available)
+        const apyChanges = protocolPools.map(p => p.apyPct7D || 0);
+        const avgChange = apyChanges.reduce((sum, c) => sum + Math.abs(c), 0) / apyChanges.length;
+
+        return {
+            avgApy,
+            maxApy,
+            totalTvlUsd,
+            poolCount: protocolPools.length,
+            apyStability: avgChange, // Lower is more stable
+            pools: protocolPools.slice(0, 5) // Top 5 pools
+        };
+    } catch (error) {
+        console.warn('Could not fetch yield data:', error);
+        return null;
+    }
+}
+
 // ============================================
 // SCORING ENGINE
 // ============================================
@@ -301,6 +337,68 @@ function calculateAllScores(protocolConfig, defiLlamaData, chainTVL) {
 }
 
 // ============================================
+// TRILEMMA SCORING
+// ============================================
+
+function calculateYieldScore(yieldData, defiLlamaData) {
+    // If no yield data available, estimate from protocol characteristics
+    if (!yieldData) {
+        // Fallback: estimate based on fees and TVL growth
+        const feeScore = defiLlamaData.fees30d ? Math.min(100, (defiLlamaData.fees30d / 1000000) * 20) : 50;
+        const change7d = defiLlamaData.change_7d || 0;
+        const growthScore = change7d > 0 ? Math.min(100, 60 + change7d * 2) : Math.max(0, 60 + change7d * 2);
+        return Math.round((feeScore * 0.6) + (growthScore * 0.4));
+    }
+
+    // Base APY score (higher APY = higher score, capped at 100%)
+    const apyScore = Math.min(100, yieldData.avgApy * 2); // 50% APY = 100 score
+
+    // Stability score (less variance = higher score)
+    const stabilityScore = Math.max(0, 100 - yieldData.apyStability * 5);
+
+    // Sustainability (TVL in yield pools vs total TVL)
+    const sustainabilityScore = yieldData.poolCount > 10 ? 80 : yieldData.poolCount > 5 ? 70 : 60;
+
+    return Math.round((apyScore * 0.50) + (stabilityScore * 0.30) + (sustainabilityScore * 0.20));
+}
+
+function calculateTrilemmaScores(pillars, yieldData, defiLlamaData) {
+    // YIELD: Return on capital
+    const yieldScore = calculateYieldScore(yieldData, defiLlamaData);
+
+    // SAFETY: Protection from loss (smart contract + governance + operational)
+    // Smart Contract (50%) + Governance (25%) + Operational (25%)
+    const safetyScore = Math.round(
+        (pillars.smartContract.score * 0.50) +
+        (pillars.governance.score * 0.25) +
+        (pillars.operational.score * 0.25)
+    );
+
+    // LIQUIDITY: Ability to exit position (liquidity pillar + operational)
+    // Liquidity (70%) + Operational (30% - for exit mechanisms)
+    const liquidityScore = Math.round(
+        (pillars.liquidity.score * 0.70) +
+        (pillars.operational.score * 0.30)
+    );
+
+    // Central trilemma score (balanced average)
+    const centralScore = Math.round((yieldScore + safetyScore + liquidityScore) / 3);
+
+    return {
+        yield: yieldScore,
+        safety: safetyScore,
+        liquidity: liquidityScore,
+        central: centralScore,
+        // Contribution mapping for UI
+        contributions: {
+            yield: ['fees', 'growth', 'apy'],
+            safety: ['smartContract', 'governance', 'operational'],
+            liquidity: ['liquidity', 'operational']
+        }
+    };
+}
+
+// ============================================
 // FINDINGS GENERATOR
 // ============================================
 
@@ -471,6 +569,16 @@ function renderScorecard(scores, protocolConfig) {
     risksList.innerHTML = findings.risks.map(r => `<li>${r}</li>`).join('');
 }
 
+function renderTrilemma(trilemmaScores) {
+    // Update central score
+    document.getElementById('trilemma-central-score').textContent = trilemmaScores.central;
+
+    // Update vertex scores
+    document.getElementById('trilemma-yield-score').textContent = trilemmaScores.yield;
+    document.getElementById('trilemma-safety-score').textContent = trilemmaScores.safety;
+    document.getElementById('trilemma-liquidity-score').textContent = trilemmaScores.liquidity;
+}
+
 // ============================================
 // MAIN APPLICATION
 // ============================================
@@ -490,17 +598,22 @@ async function loadProtocol(protocolSlug = null) {
     document.getElementById('error').classList.add('hidden');
 
     try {
-        // Fetch data
-        const [defiLlamaData, chainTVL] = await Promise.all([
+        // Fetch data (yield data is optional, so we catch errors separately)
+        const [defiLlamaData, chainTVL, yieldData] = await Promise.all([
             fetchDefiLlamaData(protocolConfig.slug),
-            fetchChainTVL(protocolConfig.chain)
+            fetchChainTVL(protocolConfig.chain),
+            fetchYieldData(protocolConfig.slug)
         ]);
 
-        // Calculate scores
+        // Calculate pillar scores
         const scores = calculateAllScores(protocolConfig, defiLlamaData, chainTVL);
+
+        // Calculate trilemma scores
+        const trilemmaScores = calculateTrilemmaScores(scores.pillars, yieldData, defiLlamaData);
 
         // Render UI
         renderScorecard(scores, protocolConfig);
+        renderTrilemma(trilemmaScores);
 
         // Show scorecard
         document.getElementById('loading').classList.add('hidden');
